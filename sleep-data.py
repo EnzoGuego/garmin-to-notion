@@ -21,10 +21,10 @@ def format_duration(seconds):
     return f"{minutes // 60}h {minutes % 60}m"
 
 def format_time(timestamp):
-    return (
-        datetime.utcfromtimestamp(timestamp / 1000).strftime("%Y-%m-%dT%H:%M:%S.000Z")
-        if timestamp else None
-    )
+    if not timestamp:
+        return None
+    dt = datetime.fromtimestamp(timestamp / 1000, local_tz)
+    return dt.isoformat()
 
 def format_time_readable(timestamp):
     return (
