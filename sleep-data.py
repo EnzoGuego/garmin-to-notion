@@ -23,8 +23,11 @@ def format_duration(seconds):
 def format_time(timestamp):
     if not timestamp:
         return None
-    dt = datetime.fromtimestamp(timestamp / 1000, local_tz)
-    return dt.isoformat()
+    # Convertit en UTC d’abord
+    dt_utc = datetime.utcfromtimestamp(timestamp / 1000).replace(tzinfo=pytz.utc)
+    # Puis convertit automatiquement vers le fuseau français (gère heure d’été/hiver)
+    dt_local = dt_utc.astimezone(local_tz)
+    return dt_local.isoformat()
 
 def format_time_readable(timestamp):
     return (
