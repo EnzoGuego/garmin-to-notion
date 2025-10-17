@@ -6,7 +6,7 @@ import pytz
 import os
 
 # Your local time zone, replace with the appropriate one if needed
-local_tz = pytz.timezone('America/Toronto')
+local_tz = pytz.timezone('Europe/Paris')
 
 ACTIVITY_ICONS = {
     "Barre": "https://img.icons8.com/?size=100&id=66924&format=png&color=000000",
@@ -206,7 +206,22 @@ def create_activity(client, database_id, activity):
         "parent": {"database_id": database_id},
         "properties": properties,
     }
-    
+        # Add VO2max value if available
+    try:
+        vo2_data = garmin.get_vo2_max()
+        if vo2_data:
+            vo2_value = None
+            # Handle different Garmin data formats
+            if isinstance(vo2_data, dict):
+                vo2_value = vo2_data.get("vo2MaxValue") or vo2_data.get("vo2maxValue")
+            elif isinstance(vo2_data, list) and len(vo2_data) > 0:
+                first_entry = vo2_data[0]
+                vo2_value = first_entry.get("vo2MaxValue") or first_entry.get("vo2maxValue")
+            
+            if vo2_value:
+                properties["VO2max"] = {"number": vo2_value}
+    except Exception as e:
+        print(f"VO2max not available: {e}")
     if icon_url:
         page["icon"] = {"type": "external", "external": {"url": icon_url}}
     
